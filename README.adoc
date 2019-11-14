@@ -16,7 +16,7 @@ $ [snap run] karuta src/bfmachine.karuta --compile
 ----
 
 == Example block design
-https://gyazo.com/8ff662a2abeb224b523194f11d2d566e
+image::https://i.gyazo.com/8ff662a2abeb224b523194f11d2d566e.png[]
 
 == License
 See https://github.com/ikubaku/bfmachine/blob/master/LICENSE[LICENSE]
