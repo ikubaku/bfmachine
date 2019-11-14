@@ -1,0 +1,22 @@
+= bfmachine
+
+Brainf*ck machine written in https://github.com/nlsynth/karuta[Karuta]
+
+== Note
+Currently requires AXI UART Lite external IP from Xilinx. Other development platforms(e.g. Intel Quartus Prime II, Lattice Diamond) are to be supported later(?)
+
+== Prerequisites
+* Xilinx Vivado (developed with version 2019.2)
+* Karuta (developed with version 0.5.0)
+
+== Build
+[source, shell]
+----
+$ [snap run] karuta src/bfmachine.karuta --compile
+----
+
+== Example block design
+https://gyazo.com/8ff662a2abeb224b523194f11d2d566e
+
+== License
+See https://github.com/ikubaku/bfmachine/LICENSE[LICENSE]
