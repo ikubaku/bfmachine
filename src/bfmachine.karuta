@@ -1,17 +1,17 @@
-@AxiMaster(AddrWidth=4)
-shared uart int[1];
+@AxiMaster()
+shared uart int[2];
 
 func main() {
     // flush tx fifo
     uart[0] = 0x00000003
-    uart.store(0x0C, 1, 0)
+    uart.store(0x4060000C, 0, 0)
     
     // Write 'A's
-    for var i int = 0; i < 10; ++i {
-        uart.load(0x08, 1, 0);
+    while(true) {
+        uart.load(0x40600008, 0, 0);
         if (uart[0] & 0x00000008) == 0x00000000 {
             uart[0] = 0x41
-            uart.store(0x04, 1, 0)
+            uart.store(0x40600004, 0, 0)
         }
     }
 }
