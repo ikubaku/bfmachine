@@ -7,7 +7,7 @@ Currently requires AXI UART Lite external IP from Xilinx. Other development plat
 
 == Prerequisites
 * Xilinx Vivado (developed with version 2019.2)
-* Karuta (developed with version 0.5.0)
+* Karuta (developed with version 0.5.2)
 
 == Build
 [source, shell]
