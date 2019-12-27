@@ -1,17 +1,102 @@
 @AxiMaster()
-shared uart int[2];
+shared main_bus #32 [2];
+
+func available() (bool) {
+    main_bus.load(0x40600008, 0, 0);
+    return (main_bus[0] & 0x00000001) == 0x00000001;
+}
+
+func can_send_byte() (bool) {
+    main_bus.load(0x40600008, 0, 0);
+    return (main_bus[0] & 0x00000008) != 0x00000008;
+}
+
+shared pbuf int[256];
+shared pbuf_idx #32;
+
+shared dbuf int[64];
+shared dbuf_idx #32;
+
+func exec() {
+    pbuf_idx = 0;
+    dbuf_idx = 0;
+    while(pbuf[pbuf_idx] != 0x0D && pbuf[pbuf_idx] != 0x0A) {
+        if(pbuf[pbuf_idx] == 0x3E) {  // <
+            dbuf_idx--;
+        } else if(pbuf[pbuf_idx] == 0x3C) {  // >
+            dbuf_idx++;
+        } else if(pbuf[pbuf_idx] == 0x2B) {  // +
+            dbuf[dbuf_idx]++;
+        } else if(pbuf[pbuf_idx] == 0x2D) {  // -
+            dbuf[dbuf_idx]--;
+        } else if(pbuf[pbuf_idx] == 0x2E) {  // .
+            // Wait for on-going transmission
+            while(!can_send_byte()) {};
+            main_bus[0] = dbuf[dbuf_idx];
+            main_bus.store(0x40600004, 0, 0);
+        } else if(pbuf[pbuf_idx] == 0x2C) {  // ,
+            // Wait for reception
+            while(!available()) {};
+            // Read a byte
+            main_bus.load(0x40600000, 0, 0);
+            dbuf[dbuf_idx] = main_bus[0];
+        } else if(pbuf[pbuf_idx] == 0x5B) {  // [
+            if(dbuf[dbuf_idx] == 0) {
+                while(pbuf[pbuf_idx] != 0x5D) {
+                    pbuf_idx++;
+                }
+            }
+        } else if(pbuf[pbuf_idx] == 0x5D) {  // ]
+            if(dbuf[dbuf_idx] != 0) {
+                while(pbuf[pbuf_idx] != 0x5B) {
+                    pbuf_idx--;
+                }
+            }
+        }
+        
+        pbuf_idx++;
+    }
+}
 
 func main() {
     // flush tx fifo
-    uart[0] = 0x00000003
-    uart.store(0x4060000C, 0, 0)
+    main_bus[0] = 0x00000003
+    main_bus.store(0x4060000C, 0, 0)
     
-    // Write 'A's
+    pbuf_idx = 0;
+    
+    // Echo back
     while(true) {
-        uart.load(0x40600008, 0, 0);
-        if (uart[0] & 0x00000008) == 0x00000000 {
-            uart[0] = 0x41
-            uart.store(0x40600004, 0, 0)
+        // Wait for reception
+        while(!available()) {};
+        // Read a byte
+        main_bus.load(0x40600000, 0, 0);
+        pbuf[pbuf_idx++] = main_bus[0];
+        
+        if(main_bus[0] == 0x0A) {
+            // echoback code
+            pbuf_idx = 0;
+            while(pbuf[pbuf_idx] != 0x0D && pbuf[pbuf_idx] != 0x0A) {
+                while(!can_send_byte()) {};
+                main_bus[0] = pbuf[pbuf_idx++];
+                main_bus.store(0x40600004, 0, 0);
+            }
+            
+            // Send newline
+            while(!can_send_byte()) {};
+            main_bus[0] = 0x0A;
+            main_bus.store(0x40600004, 0, 0);
+                
+            // Execute the code
+            exec();
+            
+            // Send newline
+            while(!can_send_byte()) {};
+            main_bus[0] = 0x0A;
+            main_bus.store(0x40600004, 0, 0);
+            
+            // Reset index
+            pbuf_idx = 0;
         }
     }
 }
