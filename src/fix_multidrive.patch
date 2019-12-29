@@ -1,0 +1,21 @@
+diff -u old/bfmachine.v new/bfmachine.v
+--- old/bfmachine.v	2019-12-28 01:15:12.975838693 +0900
++++ new/bfmachine.v	2019-12-30 00:45:31.607233843 +0900
+@@ -20,15 +20,10 @@
+   always @(posedge clk) begin
+     if (rst) begin
+     end else begin
+-      if (write_en_0_i) begin
++      if (write_en_0_i && ~write_en_1_i) begin
+         data[addr_0_i] <= wdata_0_i;
+       end
+-    end
+-  end
+-  always @(posedge clk) begin
+-    if (rst) begin
+-    end else begin
+-      if (write_en_1_i) begin
++      else if (write_en_1_i && ~write_en_0_i) begin
+         data[addr_1_i] <= wdata_1_i;
+       end
+     end
