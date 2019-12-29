@@ -12,7 +12,8 @@ Currently requires AXI UART Lite external IP from Xilinx. Other development plat
 == Build
 [source, shell]
 ----
-$ [snap run] karuta src/bfmachine.karuta --compile
+$ cd src
+$ ./build.sh
 ----
 
 == Example block design
