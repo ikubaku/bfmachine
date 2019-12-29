@@ -18,5 +18,15 @@ $ [snap run] karuta src/bfmachine.karuta --compile
 == Example block design
 image::https://i.gyazo.com/8ff662a2abeb224b523194f11d2d566e.png[]
 
+== Set up guide
+. Create the top level design(see Example block design)
+. Generate the bitstream and download design to the target board
+. Connect to the board with a UART to USB bridge or RS232C port
+. Open the terminal attached to the serial console
+
+== Usage
+. Write your program on the terminal
+. Press enter and the program starts
+
 == License
 See https://github.com/ikubaku/bfmachine/blob/master/LICENSE[LICENSE]
